@@ -1,0 +1,46 @@
+@import "./reset.css";
+
+:root {
+  --blue-bg-color: darkblue;
+  color-scheme: dark light;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+header {
+  color: white;
+  background-color: var(--blue-bg-color);
+  width: 100%;
+  padding: 8px 16px;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.gameboard {
+  width: min(500px, calc(100vw - 32px), calc(100vh - 2rem - 8px - 32px));
+  height: min(500px, calc(100vw - 32px), calc(100vh - 2rem - 8px - 32px));
+  border: 1px solid;
+  display: grid;
+  grid: repeat(3, 1fr) / repeat(3, 1fr);
+  .cell {
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: min(20vw, 20vh, 80px);
+    font-family: sans-serif;
+  }
+}
