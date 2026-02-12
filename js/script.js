@@ -1,4 +1,4 @@
-const game = () => {
+const game = (() => {
   const gameboard = (() => {
     const boardArr = [[], [], []];
     for (const row of boardArr) {
@@ -12,6 +12,7 @@ const game = () => {
         boardArr[position.y][position.x] = value;
         return checkForWinner();
       }
+      return null;
     };
 
     const clearBoard = () =>
@@ -59,19 +60,58 @@ const game = () => {
     return gameboard;
   })();
 
-  const createPlayer = (placedValue) => {
-    const place = () =>
+  const createPlayer = (placedValue, name) => {
+    const place = (position) =>
       placedValue === "X"
         ? gameboard.placeX(position)
         : gameboard.place0(position);
-    let name = placedValue;
     const player = { name, place };
     Object.freeze(player);
     return player;
   };
 
-  const players = [];
-  players.push(createPlayer("X"));
-  players.push(createPlayer("0"));
-  Object.freeze(players);
-};
+  const players = {};
+  let currentMark = "X";
+
+  const makeMove = (position) => {
+    const outcome = players[currentMark].place(position);
+    if (outcome !== null) {
+      currentMark = currentMark === "X" ? "0" : "X";
+    }
+    return outcome;
+  };
+
+  const playRound = () => {
+    for (let i = 0; i < 9; i++) {
+      const [x, y] = prompt(
+        `Enter position of ${currentMark} (example: "0 1"):`,
+      )
+        .split(" ")
+        .map((item) => parseInt(item));
+      const outcome = makeMove({ x, y });
+      if (outcome) {
+        console.log(`${players[outcome].name} won!`);
+        return;
+      }
+    }
+  };
+
+  const start = () => {
+    const nameX = prompt("1st Player's name: ");
+    const name0 = prompt("2nd Player's name:");
+    players["X"] = createPlayer("X", nameX);
+    players["0"] = createPlayer("0", name0);
+    playRound();
+  };
+
+  const restart = () => {
+    gameboard.clearBoard();
+    playRound();
+  };
+
+  const game = { start, restart };
+  Object.freeze(game);
+  return game;
+})();
+
+game.start();
