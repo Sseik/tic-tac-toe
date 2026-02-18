@@ -75,9 +75,7 @@ const game = (() => {
 
   const makeMove = (position) => {
     const outcome = players[currentMark].place(position);
-    if (outcome !== null) {
-      currentMark = currentMark === "X" ? "0" : "X";
-    }
+    currentMark = currentMark === "X" ? "0" : "X";
     return outcome;
   };
 
@@ -97,11 +95,11 @@ const game = (() => {
   };
 
   const start = () => {
-    const nameX = prompt("1st Player's name: ");
-    const name0 = prompt("2nd Player's name:");
+    const nameX = "X"; /* prompt("1st Player's name: ") */
+    const name0 = "0"; /* prompt("2nd Player's name:") */
     players["X"] = createPlayer("X", nameX);
     players["0"] = createPlayer("0", name0);
-    playRound();
+    /* playRound(); */
   };
 
   const restart = () => {
@@ -109,9 +107,56 @@ const game = (() => {
     playRound();
   };
 
-  const game = { start, restart };
+  const game = { start, makeMove, restart };
   Object.freeze(game);
   return game;
 })();
 
-game.start();
+const displayController = (() => {
+  const gameboardDiv = document.querySelector(".gameboard");
+  const cells = [...gameboardDiv.children];
+  let turn = 0;
+
+  const getPosition = (cell) => {
+    const number = cells.indexOf(cell);
+    const y = Math.floor(number / 3);
+    const x = number - 3 * y;
+    return { x, y };
+  };
+
+  const handleClick = (e) => {
+    const cell = e.target;
+    if (cell.className !== "cell") return;
+    if (cell.textContent !== "") return;
+
+    cell.textContent = turn % 2 ? "0" : "X";
+    const position = getPosition(cell);
+    const outcome = game.makeMove(position);
+    turn++;
+    if (outcome) {
+      alert(`${outcome} won!`);
+      stop();
+      return;
+    }
+    if (turn === 9) {
+      alert("It's a tie!");
+      stop();
+      return;
+    }
+  };
+
+  const start = () => {
+    turn = 0;
+    game.start();
+    gameboardDiv.addEventListener("click", handleClick);
+  };
+  const stop = () => {
+    gameboardDiv.removeEventListener("click", handleClick);
+  };
+
+  const displayController = { start };
+  Object.freeze(displayController);
+  return displayController;
+})();
+
+displayController.start();
