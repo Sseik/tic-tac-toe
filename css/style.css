@@ -23,9 +23,10 @@ h1 {
 }
 
 main {
-  display: flex;
+  display: grid;
+  grid-template-rows: auto 1fr;
   align-items: center;
-  justify-content: center;
+  justify-items: center;
   padding: 16px;
 }
 
@@ -42,5 +43,41 @@ main {
     justify-content: center;
     font-size: min(20vw, 20vh, 80px);
     font-family: sans-serif;
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  .players {
+    display: flex;
+    max-width: calc(100vw - 32px);
+    gap: 8px;
+    justify-content: center;
+    input {
+      flex-shrink: 1;
+      flex-grow: 1;
+      max-width: calc(50vw - 40px);
+    }
+    .switch-places {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  }
+  button {
+    background-color: var(--blue-bg-color);
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    color: white;
+    &:hover {
+      opacity: 0.8;
+    }
+    &:active {
+      font-size: 1.2rem;
+    }
   }
 }

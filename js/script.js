@@ -15,8 +15,7 @@ const game = (() => {
       return null;
     };
 
-    const clearBoard = () =>
-      boardArr.forEach((row) => row.forEach((item) => (item = null)));
+    const clearBoard = () => boardArr.forEach((row) => row.fill(null, 0, 3));
 
     const checkRows = () => {
       for (let y = 0; y < 3; y++) {
@@ -61,6 +60,7 @@ const game = (() => {
   })();
 
   const createPlayer = (placedValue, name) => {
+    name = name ? name : placedValue;
     const place = (position) =>
       placedValue === "X"
         ? gameboard.placeX(position)
@@ -76,38 +76,17 @@ const game = (() => {
   const makeMove = (position) => {
     const outcome = players[currentMark].place(position);
     currentMark = currentMark === "X" ? "0" : "X";
-    return outcome;
+    return players[outcome]?.name;
   };
 
-  const playRound = () => {
-    for (let i = 0; i < 9; i++) {
-      const [x, y] = prompt(
-        `Enter position of ${currentMark} (example: "0 1"):`,
-      )
-        .split(" ")
-        .map((item) => parseInt(item));
-      const outcome = makeMove({ x, y });
-      if (outcome) {
-        console.log(`${players[outcome].name} won!`);
-        return;
-      }
-    }
-  };
-
-  const start = () => {
-    const nameX = "X"; /* prompt("1st Player's name: ") */
-    const name0 = "0"; /* prompt("2nd Player's name:") */
+  const start = (nameX, name0) => {
     players["X"] = createPlayer("X", nameX);
     players["0"] = createPlayer("0", name0);
-    /* playRound(); */
-  };
-
-  const restart = () => {
     gameboard.clearBoard();
-    playRound();
+    currentMark = "X";
   };
 
-  const game = { start, makeMove, restart };
+  const game = { start, makeMove };
   Object.freeze(game);
   return game;
 })();
@@ -116,6 +95,8 @@ const displayController = (() => {
   const gameboardDiv = document.querySelector(".gameboard");
   const cells = [...gameboardDiv.children];
   let turn = 0;
+  const nameXDiv = document.querySelector("#player1-name");
+  const name0Div = document.querySelector("#player2-name");
 
   const getPosition = (cell) => {
     const number = cells.indexOf(cell);
@@ -133,7 +114,7 @@ const displayController = (() => {
     const position = getPosition(cell);
     const outcome = game.makeMove(position);
     turn++;
-    if (outcome) {
+    if (outcome !== undefined && outcome !== null) {
       alert(`${outcome} won!`);
       stop();
       return;
@@ -145,18 +126,29 @@ const displayController = (() => {
     }
   };
 
+  const clearBoard = () => {
+    cells.forEach((cell) => (cell.textContent = ""));
+  };
+
   const start = () => {
+    clearBoard();
     turn = 0;
-    game.start();
+    game.start(nameXDiv.value, name0Div.value);
     gameboardDiv.addEventListener("click", handleClick);
   };
   const stop = () => {
     gameboardDiv.removeEventListener("click", handleClick);
   };
 
+  document.querySelector(".switch-places").addEventListener("click", () => {
+    [nameXDiv.value, name0Div.value] = [name0Div.value, nameXDiv.value];
+  });
+
   const displayController = { start };
   Object.freeze(displayController);
   return displayController;
 })();
 
-displayController.start();
+document
+  .querySelector(".controls button")
+  .addEventListener("click", displayController.start);
